@@ -136,10 +136,16 @@ def conj(n):
             print("!!!!!COUNTEREXAMPLE!!!!!!")
 
 def all_hfam(n):
+    """
+    returns all (connected) hess functions for a particular n
+    """
     Dwords = [DyckWord([1] + list(d) + [0]) for d in DyckWords(n-1)]
     return [dyck_to_hess(d) for d in Dwords]
 
 def dyck_to_hess(word):
+    """
+    turns a dyck word in to the hessenberg function (in the obvious way)
+    """
     area = list(word.to_area_sequence())
     area.reverse()
     for i in range(len(area)):
