@@ -1,4 +1,14 @@
 """
+This is the testing function file for
+ - bexpansion.sage
+"""
+
+import random
+
+#bexpansion
+attach("bexpansion.sage")
+
+"""
 Code to compute the b_k(q) expansion of h-inversion polynomials
 and check whether it is stongly q-log concave
 i.e., whether b_k^2(q) - b_{k-1}(q)b_{k+1}(q) has all on-negative coefficients
@@ -6,7 +16,7 @@ i.e., whether b_k^2(q) - b_{k-1}(q)b_{k+1}(q) has all on-negative coefficients
 
 R.<q> = PolynomialRing(QQ) #Sets the polynomial ring globally
 
-def makePoset(hfam, S):
+def test_makePoset(hfam, S):
     """
     hessenberg func  -hfam
     list of inversions -S
@@ -19,7 +29,7 @@ def makePoset(hfam, S):
     direls = [(j,i) if (i,j) in S else (i,j) for (i,j) in rels] #flips those in S
     return Poset((ints_n,direls)) #returns poset on [1,...,n]
 
-def perms(hfam,S):
+def test_perms(hfam,S):
     """
     returns the set of permutations whose hfam-inversion set is S
 
@@ -28,7 +38,7 @@ def perms(hfam,S):
     P = makePoset(hfam,S)
     return [Permutation(L).inverse() for L in P.linear_extensions()]
 
-def bfam_dict(hfam, S):
+def test_bfam_dict(hfam, S):
     """
     returns a dictionary where 
     k -> (list of perms w in S_{hfam(m)} where w(hfam(m)) = k)
@@ -49,14 +59,14 @@ def bfam_dict(hfam, S):
             ret_dict[i] = Bkset
     return ret_dict
 
-def bfam_count(hfam,S):
+def test_bfam_count(hfam,S):
     """
     Returns a list of tuples (k,b_k)
     """
     BD = bfam_dict(hfam,S)
     return [(k,len(BD[k])) for k in BD.keys()]
 
-def length_genfunc(perms):
+def test_length_genfunc(perms):
     """
     returns the length generating function for a set of permutations
     """
@@ -69,7 +79,7 @@ def length_genfunc(perms):
         retpoly += q^(ell)      #q is defined globally
     return retpoly
 
-def bfam_poly(hfam,S):
+def test_bfam_poly(hfam,S):
     """
     returns dictionary 
     k -> b_k(q)
@@ -80,42 +90,28 @@ def bfam_poly(hfam,S):
         retdict[i] = length_genfunc(BD[i])
     return retdict
 
-def strongly_logconcave(hfam,S):
+def test_strongly_logconcave(hfam,S):
     """
     T/F check if the b_k(q) sequence is strongly log concave
     """
     BD = bfam_poly(hfam,S)
     coefs = sorted(BD.keys())
-    polylist = [BD[c] for c in coefs]
-    return is_strongly_log_concave(polylist)
-
-def is_strongly_log_concave(polylist):
-    """
-    takes in a list of polynomials, 
-    returns if it is strongly log concave
-    """
-    for i in range(1,len(polylist)-1):
-        checkpoly = (polylist[i])*(polylist[i]) - (polylist[i-1])*(polylist[i+1])
-        #print(checkpoly)
-        if any([coef < 0 for coef in list(checkpoly)]):
-            return False
-    return True
-
-def is_log_concave(intlist):
-    """
-    takes in a list of integers
-    returns if they are log concave
-    """
-    for i in range(1,len(intlist)-1):
-        check_at_i = (intlist[i])*(intlist[i]) - (intlist[i-1])*(intlist[i+1])
-        if check_at_i < 0:
-            return False
-    return True
+    polylist = []
+    for i in range(1,len(coefs)-1):
+        polylist += [(BD[coefs[i]])^2 - BD[coefs[i-1]]*BD[coefs[i+1]]]
+    #for i in range(len(polylist)):
+        #print(polylist[i])
+    for poly in polylist:
+        for co in list(poly):
+            if co < 0:
+                return False
+    return True 
         
-def all_admit(hfam):
+def test_all_admit(hfam):
     """
     For a given hfam, returns a list of all admissable inversion sets
     """ 
+    print()
     n = hfam[-1]
     retlist = []
     ints_n = range(1,n+1) #[1,...,n]
@@ -127,47 +123,44 @@ def all_admit(hfam):
         retlist += [S]
     return retlist
 
-def conjecture(hfam):
+def test_conjecture():
     """
     For a particular hfam, checks the log-concavity condition for all inversion sets
     """
-    allS = all_admit(hfam)
-    for S in allS:
-        if not strongly_logconcave(hfam,S):
-            print(S)
-            return False
-    return True
+    return None
 
-def conj(n):
+def test_conj():
     """
     --Prints results
     Generates all hfam on(n), then checks the
     log-concavity conditions for each inversion set
     for each of those hfam
-    """
-    for hess in all_hfam(n):
-        print(str(hess) + " --> " + str(conjecture(hess)))
-        if not conjecture(hess):
-            print("!!!!!COUNTEREXAMPLE!!!!!!")
+    """ 
+    return None
 
-def all_hfam(n):
+def test_all_hfam():
     """
     returns all (connected) hess functions for a particular n
     """
-    Dwords = [DyckWord([1] + list(d) + [0]) for d in DyckWords(n-1)]
-    return [dyck_to_hess(d) for d in Dwords]
+    print("The function all_hfam(n) returns all (connected) hessenberg functions of size n, for example:")
+    print("all_hfam(3) = " + str(all_hfam(3)) )
+    print("should be 233 and 333")
+    print("and")
+    print("The function all_hfam(n) returns all (connected) hessenberg functions of size n, for example:")
+    print("all_hfam(4) = " + str(all_hfam(4)) + "\n")
+    print("should be 2344 and 2444 and 3344 and 3444 and 4444")
+    return None
 
 
-
-def dyck_to_hess(word):
+def test_dyck_to_hess(word):
     """
     turns a dyck word in to the hessenberg function (in the obvious way)
     """
-    area = list(word.to_area_sequence())
-    area.reverse()
-    for i in range(len(area)):
-        area[i] += i+1
-    return area
-
-
-
+    print("dyck_to_hess([1,1,1,1,0,0,0,0]) = " + str(dyck_to_hess([1,1,1,1,0,0,0,0])))
+    print("should be 4444")
+    print("dyck_to_hess([1,1,1,0,1,0,0,0]) = " + str(dyck_to_hess([1,1,1,0,1,0,0,0])))
+    print("should be 3444")
+    print("dyck_to_hess([1,1,1,0,0,0,1,0]) = " + str(dyck_to_hess([1,1,1,0,0,0,1,0])))
+    print("should be 3334")
+    print("dyck_to_hess([1,0,1,0,1,0,1,0]) = " + str(dyck_to_hess([1,0,1,0,1,0,1,0])))
+    print("should be 2344")
